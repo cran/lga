@@ -1,0 +1,9 @@
+Version 1.1-0
+* Added robust version of LGA (called rlga)
+* Fixed and removed some functionality for pairs plots (no longer draws lines
+when d > 2, which were mostly counter-intuitive)
+* gap, lga and rlga are now generic methods (with defaults provided)
+* Fixed a bug with scale() in lga etc.
+
+Verion 1.0
+* First release to CRAN

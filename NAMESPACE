@@ -1,7 +1,10 @@
-export(lga, gap)
+export(lga, gap, rlga)
 import(boot, lattice)
 S3method(print, lga)
+S3method(print, rlga)
 S3method(plot, lga)
 S3method(print, gap)
 S3method(plot, gap)
-
+S3method(gap, default)
+S3method(lga, default)
+S3method(rlga, default)

@@ -1,18 +1,25 @@
 \name{lga}
 \alias{lga}
-\title{Perform LGA}
+\alias{lga.default}
+\alias{rlga}
+\alias{rlga.default}
+\title{Perform LGA/RLGA}
 \description{
   Linear Grouping Analysis
 }
 
 \usage{
-lga(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
-    nnode=NULL, silent=FALSE)
+\method{lga}{default}(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
+    nnode=NULL, silent=FALSE, ...)
+\method{rlga}{default}(x, k, alpha=0.5, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
+    nnode=NULL, silent=FALSE, ...)
 }
 
 \arguments{
   \item{x}{a numeric matrix.}
   \item{k}{an integer for the number of clusters.}
+  \item{alpha}{a numeric value between 0.5 and 1. For the robust
+  estimate of LGA, specifying the percentage of points in the best subset.}
   \item{biter}{an integer for the number of different starting
     hyperplanes to try.}
   \item{niter}{an integer for the number of iterations to attempt for
@@ -25,6 +32,7 @@ lga(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
     processing.  Defaults to NULL i.e. no parallel processing.}
   \item{silent}{logical.  If TRUE, produces no text output during
     processing.}
+  \item{...}{For any other arguments passed from the generic function.}
 }
 
 \details{
@@ -37,17 +45,18 @@ lga(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
   If \code{biter} is left as NULL, then it is selected via the equation
   given in \cite{Van Aeslt et al (2006)}.
 
-  This function is parallel computing aware via the \code{nnode}
+  The function \code{rlga} is the robust equivalent to LGA, and is
+  introduced in \cite{Garcia-Escudero et al (2008)}.
+
+  Both functions are parallel computing aware via the \code{nnode}
   argument, and works with the package \code{snow}.  In order to use
   parallel computing, one of MPI (e.g. lamboot) or PVM is necessary.
   For further details, see the documentation for \code{snow}.
   
-  Associated with the lga function are a print method and a plot method
-  (see the examples).  In the plot method, the fitted hyperplanes are
-  also shown as dashed-lines.  When there are more than 2 dimensions,
-  these represent the intersection of the fitted hyperplanes onto the
-  hyperplanes for each pair of axes.
-}
+  Associated with the lga and rlga functions are a print method and a
+  plot method (see the examples).  In the plot method, the fitted
+  hyperplanes are also shown as dashed-lines when there are only two
+  dimensions.  }
 
 \value{
   An object of class \sQuote{\dQuote{lga}} with components
@@ -66,6 +75,8 @@ lga(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
     Van Aelst, S. and Wang, X. and Zamar, R. and Zhu, R. (2006)
   \sQuote{Linear Grouping Using Orthogonal Regression},
   \emph{Computational Statistics \& Data Analysis} \bold{50}, 1287--1312.
+
+    Garcia-Escudero, L. and Gordaliz, A. and San Martin, R. and Van Aelst, S. and Zamar, R.H. (2008) \sQuote{Robust linear clustering}. Unpublished Manuscript.
 }
 
 \author{Justin Harrington \email{harringt@stat.ubc.ca}}
@@ -85,6 +96,12 @@ X <- rbind(mvrnorm(n=100, mu=c(1,-1), Sigma=diag(0.1,2)+0.9),
 lgaout <- lga(X,2)
 plot(lgaout)
 print(lgaout)
+
+## Robust equivalent
+
+rlgaout <- rlga(X,2, alpha=0.75)
+plot(rlgaout)
+print(rlgaout)
 
 
 ## nhl94 data set
@@ -116,4 +133,4 @@ abc <- lga(X, k=2, nnode=4)
 }
 
 \keyword{multivariate}
-
+\keyword{cluster}

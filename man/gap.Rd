@@ -1,13 +1,14 @@
 \name{gap}
 \alias{gap}
+\alias{gap.default}
 \title{Perform gap analysis}
 \description{
   Performs the gap analysis using lga to estimate the number of clusters.
 }
 
 \usage{
-gap(x, K, B, criteria=c("tibshirani", "DandF","none"),
-    nnode=NULL, scale=TRUE)
+\method{gap}{default}(x, K, B, criteria=c("tibshirani", "DandF","none"),
+    nnode=NULL, scale=TRUE, ...)
 }
 
 \arguments{
@@ -22,6 +23,7 @@ gap(x, K, B, criteria=c("tibshirani", "DandF","none"),
   \item{nnode}{an integer of many CPUS to use for parallel
     processing.  Defaults to NULL i.e. no parallel processing.}
   \item{scale}{logical.  Should the data be scaled?}
+  \item{...}{For any other arguments passed from the generic function.}
 }
 
 \details{
@@ -141,4 +143,4 @@ points(quakes[,2], quakes[,1], pch=lgaout2$cluster, col=lgaout2$cluster)
 }
 
 \keyword{multivariate}
-
+\keyword{cluster}

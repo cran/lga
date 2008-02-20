@@ -1,4 +1,6 @@
-"gap" <- function(x, K, B, criteria=c("tibshirani", "DandF","none"), nnode=NULL, scale=TRUE){
+gap <- function(x, K, B, ...) UseMethod("gap")
+
+"gap.default" <- function(x, K, B, criteria=c("tibshirani", "DandF","none"), nnode=NULL, scale=TRUE, ...){
     ## Setup the criteria
     criteria <- match.arg(criteria)
     doall <- ifelse(criteria=="tibshirani", FALSE, TRUE)
@@ -7,7 +9,7 @@
     x <- as.matrix(x)
     if (any(is.na(x))) stop("Missing data in x")
     if(scale)
-        x <- scale(x, center=FALSE, scale=TRUE)
+        x <- scale(x, center=FALSE, scale=sqrt(apply(x,2,var)))
     if (!is.numeric(x)) stop("Data does not appear to be numeric.\n")
     n <- nrow(x); d <- ncol(x)
 

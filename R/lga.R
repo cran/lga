@@ -1,11 +1,13 @@
-"lga" <- function(x, k, biter=NULL, niter=10, showall=FALSE, scale=TRUE,
-                  nnode=NULL, silent=FALSE){
+lga <- function(x, k, ...) UseMethod("lga")
+
+"lga.default" <- function(x, k, biter=NULL, niter=10, showall=FALSE, scale=TRUE,
+                  nnode=NULL, silent=FALSE, ...){
     ## Scale the dataset (if required), otherwise parse to a matrix
     x <- as.matrix(x)
     if (any(is.na(x))) stop("Missing data in x")
 
     if(scale)
-        x <- scale(x, center=FALSE, scale=TRUE)
+        x <- scale(x, center=FALSE, scale=sqrt(apply(x,2,var)))
     if (!is.numeric(x)) stop("Data does not appear to be numeric.\n")
     n <- nrow(x); d <- ncol(x)
 
@@ -67,47 +69,6 @@
     return(fout)
 }
 
-
-"print.lga" <- function(x, ...) { ## S3method for printing LGA class
-    cat("Output from LGA:\n\nDataset scaled =", x$scale, "\tk =",x$k,"\tniter =",x$niter,"\tbiter =",
-        x$biter,"\nNumber of converged =",x$nconverg,"\nBest clustering has ROSS =",x$ROSS,"\n")
-}
-
-"plot.lga" <- function(x, ...) { ## S3method for plotting LGA class
-    nclust <- x$k;   d <- ncol(x$x)
-    hp <- matrix(NA, ncol=nclust, nrow=(d+1))
-
-    ## Fit the hyperplanes
-    for (i in 1:nclust)
-        hp[,i] <- lga.orthreg(x$x[x$cluster == i,])
-
-    ## 2-d case
-    if (d == 2){
-        plot(x$x, col=x$cluster, type="p", xlab="",ylab="", ...)
-        for (i in 1:nclust)
-            abline(a= hp[3,i]/hp[2,i], b= -hp[1,i]/hp[2,i], lty=2, col=i)
-    }
-    else{
-        ## We do a rather complicated trick here using frames, as we need to know what pair of axes we are plotting
-        ## in order to do the correct hyperplane intersections.
-	lgaPlotCounter <- 0  ## this increments for each plot
-	sysFrame <- sys.frame(sys.nframe()) ## this is the pointer to the current frame
-
-	refMatrix<- matrix(NA, ncol=2, nrow=0) ## this matrix tells us which pair of axes
-	for (j in 2:d) for (i in 1:(j-1)) refMatrix <- rbind(refMatrix, c(i,j))
-
-        ## data.frame makes splom compatible with earlier versions of R
-        splom(data.frame(x$x), lower.panel=function(x,y,...){}, upper.panel=function(x, y, hp, clusters, sysframe, refMatrix, ...)
-          {
-              int <- nrow(hp); nclust <- ncol(hp)
-              assign("lgaPlotCounter", get("lgaPlotCounter", envir=sysframe) + 1, envir=sysframe)
-              refV <- refMatrix[get("lgaPlotCounter", envir=sysframe),]
-              panel.xyplot(x, y, col=clusters, ...)
-              for (i in 1:nclust)
-                  panel.abline(a= hp[int,i]/hp[ refV[2], i], b= -hp[ refV[1], i]/hp[ refV[2], i], lty=2, col=i)
-          }, hp=hp, clusters=x$cluster, sysframe=sysFrame, refMatrix=refMatrix)
-    }
-}
 
 "lga.calculateROSS" <- function(hpcoef, xsc, n, d, groups){
     ## This function calculates the total Residual Orthogonal Sum of Squares for a given grouping
@@ -175,5 +136,31 @@
     y <- scale(x, scale=FALSE)
     emat <- svd(y)$v[,dim(y)[2]]
     return(c(emat, emat %*% attr(y, 'scaled:center')))
+}
+
+"print.lga" <- function(x, ...) { ## S3method for printing LGA class
+    cat("Output from LGA:\n\nDataset scaled =", x$scale, "\tk =",x$k,"\tniter =",x$niter,"\tbiter =",
+        x$biter,"\nNumber of converged =",x$nconverg,"\nBest clustering has ROSS =",x$ROSS,"\n")
+}
+
+"plot.lga" <- function(x, ...) { ## S3method for plotting LGA class
+    nclust <- x$k;
+    d <- ncol(x$x)
+    clustcols <- x$cluster + ifelse(inherits(x, "rlga"), 1, 0)
+    hp <- matrix(NA, ncol=nclust, nrow=(d+1))
+    
+    ## Fit the hyperplanes
+    for (i in 1:nclust)
+      hp[,i] <- lga.orthreg(x$x[x$cluster == i,])
+    
+    ## 2-d case
+    if (d == 2){
+      plot(x$x, col=clustcols, type="p", ...)
+      for (i in 1:nclust)
+        abline(a= hp[3,i]/hp[2,i], b= -hp[1,i]/hp[2,i], lty=2, col=i)
+    }
+    else{
+      pairs(x$x, col=clustcols, ...)
+    }
 }
 
