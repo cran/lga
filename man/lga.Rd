@@ -11,7 +11,7 @@
 \usage{
 \method{lga}{default}(x, k, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
     nnode=NULL, silent=FALSE, ...)
-\method{rlga}{default}(x, k, alpha=0.5, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
+\method{rlga}{default}(x, k, alpha=0.9, biter = NULL, niter = 10, showall = FALSE, scale = TRUE,
     nnode=NULL, silent=FALSE, ...)
 }
 
@@ -59,16 +59,17 @@
   dimensions.  }
 
 \value{
-  An object of class \sQuote{\dQuote{lga}} with components
+  An object of class \sQuote{\dQuote{lga}}. The list contains
   \item{cluster}{a vector containing the cluster memberships.}
   \item{ROSS}{the Residual Orthogonal Sum of Squares for the solution.}
   \item{converged}{a logical. True if at least one solution has converged.}
-  \item{biter}{the biter setting used.}
-  \item{niter}{the niter setting used.}
   \item{nconverg}{the number of converged solutions (out of biter starts).}
+  \item{x}{the (scaled if selected) dataset.}
+  and the attributes include
   \item{scaled}{logical. Is the data scaled?}
   \item{k}{the number of clusters to be found.}
-  \item{x}{the (scaled if selected) dataset.}
+  \item{biter}{the biter setting used.}
+  \item{niter}{the niter setting used.}
 }
 
 \references{
@@ -76,7 +77,11 @@
   \sQuote{Linear Grouping Using Orthogonal Regression},
   \emph{Computational Statistics \& Data Analysis} \bold{50}, 1287--1312.
 
-    Garcia-Escudero, L. and Gordaliz, A. and San Martin, R. and Van Aelst, S. and Zamar, R.H. (2008) \sQuote{Robust linear clustering}. Unpublished Manuscript.
+  Garcia-Escudero, L.A., Gordaliza, A., San Martin, R., Van Aelst, S. and
+  Zamar, R.H. (2008) \sQuote{Robust linear clustering}. To appear in
+  \emph{Journal of the Royal Statistical Society, Series B} (accepted
+  June, 2008).
+
 }
 
 \author{Justin Harrington \email{harringt@stat.ubc.ca}}
@@ -119,6 +124,12 @@ plot(lga(log(brain, base=10), k=3))
 data(ob)
 plot(lga(log(ob[,2:3]), k=3), pch=as.character(ob[,1]))
 
+## Corridor Walls data set
+## To obtain the results reported in Garcia-Escudero et al. (2008):
+data(corridorWalls)
+rlgaout <- rlga(corridorWalls, k=3, biter = 100, niter = 30, alpha=0.85)
+pairs(corridorWalls, col=rlgaout$cluster+1)
+plot(rlgaout)
 
 ## Parallel processing case
 ## In this example, running using 4 nodes. 

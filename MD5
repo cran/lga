@@ -1,0 +1,17 @@
+d3b37b48dda39e3ca86bf1562b099761 *ChangeLog
+990eeafba558d20910292a3fc7e0ddc8 *DESCRIPTION
+f575b9f8ee0f63cd607e03695e065e95 *NAMESPACE
+1816fb81e435f437e46a3f33fdc419e8 *R/gap.R
+e31d64afb011633c00accaadd271a9a6 *R/lga.R
+73d9f535aaeb02553bb3ee97e5a31b0f *R/rlga.R
+5196ee143b9008d7e6ea3ecd86630958 *data/brain.rda
+6428c05e94224f01d2e15d4379aa1ba8 *data/corridorWalls.rda
+d6f306181fa4cc0c97db702e0a76598c *data/nhl94.rda
+6c1444ede860ae2448e84c65b4b504bf *data/ob.rda
+cd3845807a05307fded33c427ff82873 *man/brain.Rd
+a926a4c100a3f57371cf9982af3b6a42 *man/corridorWalls.Rd
+298b8d9ae9db255398295e50c85907e6 *man/gap.Rd
+5a63a18135c0a08c32a101f2094e1c57 *man/lga-package.Rd
+1b4a619ad0127ed3def2e2d4731f7e6b *man/lga.Rd
+b1ef8204e74fb20516295c349f17c23c *man/nhl94.Rd
+11f7b2e249afc3eee99afc27f892850a *man/ob.Rd

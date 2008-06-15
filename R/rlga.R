@@ -1,27 +1,37 @@
-rlga <- function(x, k, alpha=0.5, ...)  UseMethod("rlga")
+rlga <- function(x, k, alpha=0.9, ...)  UseMethod("rlga")
 
-"rlga.default" <- function(x, k, alpha=0.5, biter=NULL, niter=10, showall=FALSE, scale=TRUE,
+"rlga.default" <- function(x, k, alpha=0.9, biter=NULL, niter=10, showall=FALSE, scale=TRUE,
                   nnode=NULL, silent=FALSE, ...){
     ## Scale the dataset (if required), otherwise parse to a matrix
     x <- as.matrix(x)
-    if (any(is.na(x))) stop("Missing data in x")
+    if (any(is.na(x))) stop("missing data in 'x'")
 
     if(scale)
         x <- scale(x, center=FALSE, scale=sqrt(apply(x,2,var)))
-    if (!is.numeric(x)) stop("Data does not appear to be numeric.\n")
+    if (!is.numeric(x)) stop("'x' does not appear to be numeric.\n")
     n <- nrow(x); d <- ncol(x)
 
     ## Check alpha
     if (alpha < 0.5 || alpha > 1)
-      stop("Alpha must be in [0.5, 1].")
-    
-    ## Set the number of random starts (if not provided)
-    if (is.null(biter))
-        if(is.na(biter <- lga.NumberStarts(n, d, k, p=0.95)))
-            stop("NumberStarts ill-specified. Rerun, setting biter \n")
+      stop("'alpha' must be in [0.5, 1].")
 
+    ## Check the number of groups
+    if (floor(k) != k)
+      stop("'k' is not an integer")
+    else if (k < 1)
+      stop ("'k' is not greater than 0")
+    else if (k == 1) {
+      warning("'k' is equal to 1 - performing robust orthogonal regression")
+      biter <- 100
+    }
+    else {
+      ## Set the number of random starts (if not provided)
+      if (is.null(biter))
+        if(is.na(biter <- lga.NumberStarts(n, d, k, p=0.95)))
+          stop("'biter' ill-specified. Rerun, setting 'biter'\n")
+    }
     if (!silent)
-        cat("LGA Algorithm \nk =", k, "\tBiter =", biter, "\tNiter =", niter, "\n")
+        cat("RLGA Algorithm \nk =", k, "\tbiter =", biter, "\tniter =", niter, "\n")
 
     ## Choose the starting hyperplane coefficients for each biter
     hpcoef <- list()
@@ -68,9 +78,24 @@ rlga <- function(x, k, alpha=0.5, ...)  UseMethod("rlga")
         cat("\nFinished.\n")
         if(showall) cat("\nReturning all outputs \n", "")
     }
-    fout <- list(cluster=outputs[1:n,], ROSS=outputs[n+2,], converged=outputs[n+1,],
-                 biter=biter, niter=niter, nconverg=nconverg, scaled=scale, k=k, x=x, alpha=alpha)
-    class(fout) <- c("rlga","lga")
+
+    if (!showall){
+      ## Fit hyerplane(s)
+      hp <- matrix(NA, nrow=k, ncol=(d+1))
+      for (i in 1:k)
+        hp[i,] <- lga.orthreg(x[outputs[1:n,] == i,])
+      ROSS <- lga.calculateROSS(hp, x, n, d, outputs[1:n,])
+    }
+    else {
+      ROSS <- outputs[n+2,]
+      hp <- NULL
+    }
+
+    fout <- list(cluster=outputs[1:n,], ROSS=ROSS, converged=outputs[n+1,], 
+                 nconverg=nconverg, x=x, hpcoef=hp)
+
+    attributes(fout) <- list(class=c("rlga","lga"), biter=biter, niter=niter, scaled=scale, k=k, alpha=alpha,
+                             names=names(fout))
     return(fout)
 }
 
@@ -93,13 +118,15 @@ rlga <- function(x, k, alpha=0.5, ...)  UseMethod("rlga")
             iter <- (niter+10) # if there aren't enough obs in a group
         if (all(oldgroups==groups)) converged <- TRUE
     }
-    return(c(groups, converged, lga.calculateROSS(hpcoef, xsc, n, d, groups)))
+    return(list(groups, converged, lga.calculateROSS(hpcoef, xsc, n, d, groups)))
 }
 
 "rlga.dodist" <- function(y, coeff, k, d, n, alpha){
-    ## This function calculates the (orthogonal) Residuals for different hyerplanes,
-    ## calculates which hyperplane each observation is closest to, and then takes the smallest alpha of them (setting the rest to zero)
-    dist <- (y %*% t(coeff[,1:d])- matrix(coeff[,d+1], ncol=k, nrow=n, byrow=TRUE))^2
+  ## This function calculates the (orthogonal) Residuals for different hyerplanes,
+  ## calculates which hyperplane each observation is closest to, and then takes the
+  ## smallest alpha of them (setting the rest to zero)
+  
+    dist <- (y %*% t(coeff[,1:d, drop=FALSE])- matrix(coeff[,d+1, drop=FALSE], ncol=k, nrow=n, byrow=TRUE))^2
     mindist <- max.col(-dist, ties.method="first")
     mindist2 <- dist[cbind(1:n, mindist)]
     mindist[ mindist2 > quantile(mindist2, alpha) ] <- 0
@@ -108,7 +135,9 @@ rlga <- function(x, k, alpha=0.5, ...)  UseMethod("rlga")
 
 
 "print.rlga" <- function(x, ...) { ## S3method for printing LGA class
-    cat("Output from RLGA:\n\nDataset scaled =", x$scale, "\tk =",x$k,"\tniter =",x$niter,"\tbiter =", 
-        x$biter,"\nAlpha =", x$alpha, "\nNumber of converged =",x$nconverg,"\nBest clustering has ROSS =",x$ROSS,"\n")
+    cat("Output from RLGA:\n\nDataset scaled =", attr(x, "scaled"), "\tk =",attr(x, "k"),
+        "\tniter =",attr(x, "niter"), "\tbiter =", attr(x, "biter"), "\nAlpha =", attr(x, "alpha"),
+        "\nNumber of converged =",x$nconverg, ifelse(length(x$ROSS)>1, "\nROSS =", "\nBest clustering has ROSS ="),
+        x$ROSS,"\n")
 }
 

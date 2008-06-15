@@ -1,3 +1,13 @@
+Version 1.1-1
+* Set default alpha for rlga to 0.9 (was 0.5)
+* Updated reference for rlga
+* Added a new data set (corridorWalls), added a man file, and included an 
+example for rlga using this data
+* Change now perform orthogonal regression (both non-robust and robust) by
+setting k = 1.
+* Some behind-the-scenes changes to the lga object model (biter, niter, k are
+now attributes)
+
 Version 1.1-0
 * Added robust version of LGA (called rlga)
 * Fixed and removed some functionality for pairs plots (no longer draws lines

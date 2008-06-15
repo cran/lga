@@ -1,12 +1,17 @@
 Package: lga
-Version: 1.1-0
-Date: 2008-02-20
+Version: 1.1-1
+Date: 2008-06-15
 Title: Tools for linear grouping analysis (LGA)
 Author: Justin Harrington
-Maintainer: Justin Harrington <harringt@stat.ubc.ca>
+Maintainer: ORPHANED
 Depends: R (>= 2.2.1)
 Imports: boot, lattice
-Suggests: snow
-Description: Tools for linear grouping analysis. Three user-level functions: gap, rlga and lga.
+Suggests: snow, MASS, maps
+Description: Tools for linear grouping analysis. Three user-level
+        functions: gap, rlga and lga.
 License: GPL
-Packaged: Fri Feb 22 14:46:17 2008; harringt
+Packaged: 2012-01-13 08:38:53 UTC; ripley
+X-CRAN-Comment: Orphaned on 2012-01-10 as maintainer address bounces
+        and maintainer is untraceable.
+Repository: CRAN
+Date/Publication: 2012-01-13 08:52:30

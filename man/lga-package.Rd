@@ -20,7 +20,11 @@
   \emph{Computational Statistics \& Data Analysis} \bold{50},
   1287--1312.
 
-  Garcia-Escudero, L. and Gordaliz, A. and San Martin, R. and Van Aelst, S. and Zamar, R.H. (2008) \sQuote{Robust linear clustering}. Unpublished Manuscript.
+  Garcia-Escudero, L.A., Gordaliza, A., San Martin, R., Van Aelst, S. and
+  Zamar, R.H. (2008) \sQuote{Robust linear clustering}. To appear in
+  \emph{Journal of the Royal Statistical Society, Series B} (accepted
+  June, 2008).
+  
 }
 
 \author{Justin Harrington \email{harringt@stat.ubc.ca}}
